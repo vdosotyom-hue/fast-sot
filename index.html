@@ -240,6 +240,46 @@
             text-align: center;
             font-size: 13px;
         }
+
+/* 📱 เพิ่มโค้ดส่วนนี้ต่อท้ายใน <style> เพื่อคุมหน้าจอมือถือ */
+        @media screen and (max-width: 768px) {
+            /* 1. ปรับการย้อมสีแบนเนอร์ด้านบนให้พอดีมือถือ */
+            .hero-banner {
+                height: 350px;
+                padding: 0 20px;
+            }
+            .hero-content h2 {
+                font-size: 24px; /* ปรับขนาดตัวอักษรหัวข้อให้เล็กลงในมือถือ */
+            }
+
+            /* 2. สั่งยกเลิกระบบตาราง และเปลี่ยนมาเป็นกล่องอิสระ */
+            .services-grid {
+                display: block; /* ยกเลิก display: table */
+                width: 100%;
+            }
+            
+            .services-row {
+                display: block; /* ยกเลิก display: table-row */
+            }
+
+            /* 3. บังคับให้แต่ละกล่องบริการขยายเต็ม 100% และตกลงมาเรียงเป็นแนวตั้ง */
+            .service-card {
+                display: block; /* เปลี่ยนจาก table-cell เป็น block */
+                width: 100% !important; /* บังคับให้กว้างเต็มจอมือถือ */
+                margin-bottom: 20px; /* เพิ่มระยะห่างระหว่างกล่องบน-ล่าง */
+                padding: 30px 20px;
+            }
+
+            /* 4. ซ่อนกล่องเปล่าที่เราเคยเอาไว้รักษาสมดุล ไม่ให้โผล่มาเป็นช่องว่างในมือถือ */
+            .services-row div.service-card[style*="background: transparent"] {
+                display: none !important;
+            }
+            
+            /* ซ่อนแถวเว้นวรรคเดิมเพื่อไม่ให้ระยะห่างในมือถือห่างเกินไป */
+            .services-row[style*="height:"] {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
