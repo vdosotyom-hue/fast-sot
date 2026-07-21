@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast SOT - ระบบบริการสร้าง Static QR Code ฟรี</title>
+    <!-- นำเข้า Google Font 'Sarabun' และ Font Awesome ตามธีมหลักของคุณ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- เรียกใช้ไลบรารีสำหรับเจน QR Code ที่แม่นยำสูง -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7f8;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* แถบด้านบนสุด (Top Bar) */
+        .top-bar {
+            background-color: #4a4a4a;
+            color: #ffffff;
+            padding: 10px 20px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ff5722;
+        }
+
+        /* ส่วนหัวเว็บไซต์ (Header) */
+        .main-header {
+            background-color: #ffffff;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+        }
+        .logo-area img {
+            height: 70px;
+            width: auto;
+            margin-right: 25px;
+        }
+        .header-text h1 {
+            font-size: 22px;
+            color: #2b2b2b;
+            font-weight: 700;
+        }
+        .header-text p {
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        /* เมนูบาร์เพิ่มเติมให้กดกลับหน้าหลักได้ง่าย */
+        .nav-links a {
+            color: #4a4a4a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 20px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: #ff5722;
+        }
+
+        /* ส่วนภาพพื้นหลังฮีโร่แบนเนอร์ (ปรับความเคลียร์ให้ภาพพื้นหลังชัดใสขึ้น) */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 380px; 
+            background-image: url('bg-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            padding: 0 60px;
+            overflow: hidden;
+        }
+
+        /* ย้อมสี Overlay แบบส้ม-เทาโปร่งแสงที่เคลียร์ขึ้น (ปรับลดค่าลงเพื่อให้เห็นภาพตึก/คน ชัดเจนขึ้น) */
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(43, 43, 43, 0.45) 40%, rgba(255, 87, 34, 0.25) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2; 
+            color: #ffffff;
+            text-align: left;
+            max-width: 800px;
+        }
+
+        .welcome-tag {
+            background-color: #ff5722;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-content h2 {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.4;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .hero-content p {
+            font-size: 16px;
+            color: #ffffff;
+            line-height: 1.6;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* ส่วนเนื้อหาหลัก */
+        .container {
+            max-width: 1200px;
+            margin: -40px auto 60px auto; 
+            position: relative;
+            z-index: 3;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-title-box {
+            background-color: #ffffff;
+            padding: 25px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #4a4a4a; 
+            font-weight: 700;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 4px;
+            background-color: #ff5722;
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        /* กล่องการ์ดเครื่องมือสร้าง QR Code ดีไซน์ระดับพรีเมียมในธีม Fast SOT */
+        .generator-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            max-width: 550px;
+            width: 100%;
+            border-top: 5px solid #ff5722;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .input-box i {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            color: #a0aec0;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff5722;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.15);
+        }
+
+        .btn-generate {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.2);
+        }
+        .btn-generate:hover {
+            background-color: #e64a19;
+            transform: translateY(-1px);
+        }
+
+        #qrcode {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+        #qrcode img {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .btn-download {
+            background-color: #4a4a4a;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: none; /* รอเจนภาพเสร็จถึงจะแสดงผล */
+            width: 100%;
+            transition: background 0.2s ease;
+            box-shadow: 0 4px 10px rgba(74, 74, 74, 0.2);
+        }
+        .btn-download:hover {
+            background-color: #2b2b2b;
+        }
+
+        /* ส่วนท้ายเว็บ */
+        footer {
+            background-color: #2b2b2b;
+            color: #aaaaaa;
+            padding: 25px;
+            text-align: center;
+            font-size: 13px;
+            margin-top: auto;
+            line-height: 1.7;
+        }
+
+        /* Responsive มือถือ */
+        @media screen and (max-width: 768px) {
+            .hero-banner {
+                height: 320px;
+                padding: 0 20px;
+            }
+            .hero-content h2 {
+                font-size: 24px;
+            }
+            .main-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+                padding: 15px;
+            }
+            .logo-area img {
+                margin-right: 0;
+            }
+            .nav-links {
+                margin-top: 10px;
+            }
+            .nav-links a {
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- แถบด้านบนสุด -->
+    <div class="top-bar">
+        <div>⚡ Fast SOT: บริการงานโสตทัศนศึกษา สะดวก รวดเร็ว ทันใจ</div>
+        <div>ระบบออนไลน์สำหรับเจ้าหน้าที่ รพ.เจ้าพระยายมราช</div>
+    </div>
+
+    <!-- ส่วนหัวดึงโลโก้และเท็กซ์หลัก -->
+    <header class="main-header">
+        <div class="logo-area">
+            <img src="logoFastSOT.jpg" alt="Fast SOT Logo">
+            <div class="header-text" style="text-align: left;">
+                <h1>หน่วยงานเวชนิทัศน์และโสตทัศนศึกษา</h1>
+                <p>Chaophrayayommarat Hospital | Audio Visual Department</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ฮีโร่แบนเนอร์ย้อมสีแบบส้ม-เทาโปร่งแสงชนิดชัดใสเคลียร์ตา -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <span class="welcome-tag">WELCOME TO FAST SOT YOMMARAT</span>
+            <h2>ระบบบริการสร้าง Static QR Code</h2>
+            <p>สร้างรหัสคิวอาร์โค้ดแบบฝังลิงก์ตรง ไม่มีวันหมดอายุ สแกนเร็ว และไม่มีโฆษณาคั่นให้กวนใจ</p>
+        </div>
+    </div>
+
+    <!-- ส่วนกล่องเครื่องมือสร้างคิวอาร์โค้ด -->
+    <div class="container">
+        
+        <div class="main-title-box">
+            <h2 class="section-title">เครื่องมือเจนรหัส QR Code ฟรีเพื่อหน่วยงาน</h2>
+        </div>
+
+        <div class="generator-card">
+            <div class="input-box">
+                <i class="fa-solid fa-link"></i>
+                <input type="text" id="url-input" placeholder="วางลิงก์ URL ที่ต้องการสร้างที่นี่..." value="https://vdosotyom-hue.github.io/fast-sot/">
+            </div>
+            
+            <button class="btn-generate" onclick="generateQR()">
+                <i class="fa-solid fa-qrcode" style="margin-right: 8px;"></i> สร้างรหัส QR Code
+            </button>
+
+            <div id="qrcode"></div>
+            
+            <button id="download-btn" class="btn-download" onclick="downloadQR()">
+                <i class="fa-solid fa-download" style="margin-right: 8px;"></i> ดาวน์โหลดรูปภาพ QR Code (.png)
+            </button>
+        </div>
+
+        <!-- พื้นที่ติดป้ายโฆษณาหารายได้เข้าเว็บของคุณ -->
+        <div class="ads-wrap">
+            <div class="ads-box">
+                <i class="" style="margin-right: 8px;"></i> 
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ส่วนท้ายเว็บสไตล์เดิม -->
+    <footer>
+        <p>© 2026 Fast SOT - งานเวชนิทัศน์และโสตทัศนศึกษา กลุ่มงานพัฒนาทรัพยากรบุคคล โรงพยาบาลเจ้าพระยายมราช สุพรรณบุรี <br> 035-514999 ต่อ 1906 หรือ 1907 ในวันเเละเวลาทำการ (จันทร์ - ศุกร์ เวลา 8.30 - 16.30 น.) </p>
+    </footer>
+
+    <!-- จาวาสคริปต์ควบคุมระบบเจนคิวอาร์และปุ่มดาวน์โหลดความแม่นยำสูง -->
+    <script>
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            width: 240,
+            height: 240,
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        function generateQR() {
+            var elText = document.getElementById("url-input");
+            if (!elText.value.trim()) {
+                alert("กรุณากรอกลิงก์ URL ก่อนครับ");
+                return;
+            }
+            qrcode.clear(); 
+            qrcode.makeCode(elText.value.trim()); 
+            
+            // ปลดล็อกเปิดแสดงปุ่มดาวน์โหลดสีเทาเข้ม
+            setTimeout(function() {
+                document.getElementById("download-btn").style.display = "block";
+            }, 300);
+        }
+
+        function downloadQR() {
+            var qrImage = document.querySelector("#qrcode img");
+            if (qrImage) {
+                var imgSource = qrImage.src;
+                var downloadLink = document.createElement("a");
+                downloadLink.href = imgSource;
+                downloadLink.download = "fastsot-static-qrcode.png";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            } else {
+                alert("ระบบตรวจหาไฟล์ภาพไม่พบ กรุณากดสร้างรหัสใหม่อีกครั้งครับ");
+            }
+        }
+
+        // เจนค่าเริ่มต้นจากลิงก์ของคุณทันทีเมื่อเปิดหน้าจอเว็บ
+        generateQR();
+    </script>
+</body>
+</html>
