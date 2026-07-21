@@ -280,6 +280,83 @@
                 display: none !important;
             }
         }
+/* ⭐️ ปุ่มลอยขอบขวามือสำหรับลิงก์ไปหน้า QR Code */
+.floating-qr-widget {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 87, 34, 0.85); /* สีส้มโปร่งแสงจางๆ */
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 16px 12px 14px;
+    border-radius: 30px 0 0 30px;
+    box-shadow: -2px 4px 15px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px); /* เอฟเฟกต์เบลอพื้นหลังกระจกจางๆ */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    opacity: 0.7; /* ความจางเริ่มต้น */
+}
+
+/* เมื่อเมาส์ชี้ (Hover) ปุ่มจะสว่างขึ้นและเด่นออกมา */
+.floating-qr-widget:hover {
+    opacity: 1;
+    background: rgba(255, 87, 34, 1);
+    padding-right: 22px;
+    box-shadow: -4px 6px 20px rgba(255, 87, 34, 0.35);
+}
+
+.floating-qr-icon {
+    width: 38px;
+    height: 38px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.floating-qr-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: #ff5722;
+}
+
+.floating-qr-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.floating-qr-text span.title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.floating-qr-text span.sub {
+    font-size: 11px;
+    opacity: 0.9;
+}
+
+/* ซ่อนบนจอมือถือเล็กๆ เพื่อไม่ให้บังเนื้อหา */
+@media screen and (max-width: 480px) {
+    .floating-qr-widget {
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        border-radius: 25px;
+        right: 15px;
+        padding: 10px 15px;
+    }
+    .floating-qr-text span.sub {
+        display: none;
+    }
+}
     </style>
 </head>
 <body>
@@ -318,7 +395,7 @@
             <h2 class="section-title">ระบบบันทึกข้อมูลและบริการออนไลน์</h2>
         </div>
 
-        <div class="services-grid">
+       <div class="services-grid">
             
             <!-- แถวที่ 1 -->
             <div class="services-row">
@@ -334,12 +411,11 @@
 
                 <!-- 2. ติดต่อทาง LINE -->
                 <a href="https://lin.ee/o1ewnhB" class="service-card" target="_blank">
-                  <div class="icon-wrapper">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path fill="#fff"
-        d="M12 2C6.48 2 2 5.77 2 10.42c0 4.17 3.55 7.66 8.35 8.25.33.07.78.22.89.51.1.26.06.66.03.92l-.13.87c-.04.26-.21 1.01.88.55 1.09-.46 5.86-3.44 8-5.88C21.28 14.33 22 12.44 22 10.42 22 5.77 17.52 2 12 2zM8.2 12.8H6.5V8.5a.5.5 0 011 0v3.3h.7a.5.5 0 010 1zm2.3 0a.5.5 0 01-1 0V8.5a.5.5 0 011 0v4.3zm4.28 0a.5.5 0 01-.44-.27l-1.84-3.3v3.07a.5.5 0 01-1 0V8.5a.5.5 0 01.94-.24l1.84 3.3V8.5a.5.5 0 011 0v4.3a.5.5 0 01-.5.5zm3.22-3.3h-1.5v.9h1.5a.5.5 0 010 1h-1.5v.9H18a.5.5 0 010 1h-2a.5.5 0 01-.5-.5V8.5A.5.5 0 0116 8h2a.5.5 0 010 1z"/>
-</svg>
-</div>
+                    <div class="icon-wrapper">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="#fff" d="M12 2C6.48 2 2 5.77 2 10.42c0 4.17 3.55 7.66 8.35 8.25.33.07.78.22.89.51.1.26.06.66.03.92l-.13.87c-.04.26-.21 1.01.88.55 1.09-.46 5.86-3.44 8-5.88C21.28 14.33 22 12.44 22 10.42 22 5.77 17.52 2 12 2zM8.2 12.8H6.5V8.5a.5.5 0 011 0v3.3h.7a.5.5 0 010 1zm2.3 0a.5.5 0 01-1 0V8.5a.5.5 0 011 0v4.3zm4.28 0a.5.5 0 01-.44-.27l-1.84-3.3v3.07a.5.5 0 01-1 0V8.5a.5.5 0 01.94-.24l1.84 3.3V8.5a.5.5 0 011 0v4.3a.5.5 0 01-.5.5zm3.22-3.3h-1.5v.9h1.5a.5.5 0 010 1h-1.5v.9H18a.5.5 0 010 1h-2a.5.5 0 01-.5-.5V8.5A.5.5 0 0116 8h2a.5.5 0 010 1z"/>
+                        </svg>
+                    </div>
                     <h3>LINE FastSOT</h3>
                     <p>ติดต่อสั่งทำป้าย ออกแบบสื่อประชาสัมพันธ์ โปสเตอร์งานวิชาการ ตัดสติกเกอร์ ปริ้นงาน หรือ สอบถามเพิ่มเติม </p>
                 </a>
@@ -388,10 +464,26 @@
                     <p>ถ่ายทำและตัดต่อวิดีโอกิจกรรม ผลิตสื่อการสอนทางการแพทย์ และงานวิดีโอพรีเซนเตชันหน่วยงาน</p>
                 </a>
 
+            </div>   
+                <!-- กล่องเปล่าเพื่อรักษาสมดุล 3 คอลัมน์สำหรับหน้าจอคอม -->
+                <div class="service-card" style="background: transparent; box-shadow: none; border: none; cursor: default;"></div>
+                <div class="service-card" style="background: transparent; box-shadow: none; border: none; cursor: default;"></div>
+
             </div>
         </div>
     </div>
-
+<!-- ⭐️ ปุ่มลอยด้านขวามือ ลิงก์ไปหน้าสร้าง QR Code -->
+    <a href="SOTQRCODE.html" class="floating-qr-widget" title="คลิกเพื่อไปหน้าสร้าง QR Code">
+        <div class="floating-qr-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3v-3zm0-3h3v2h-3v-2z"/>
+            </svg>
+        </div>
+        <div class="floating-qr-text">
+            <span class="title">สร้าง QR Code</span>
+            <span class="sub">บริการออนไลน์ฟรี</span>
+        </div>
+    </a>
     <!-- ส่วนท้ายเว็บ -->
     <footer>
         <p>© 2026 Fast SOT - งานเวชนิทัศน์และโสตทัศนศึกษา กลุ่มงานพัฒนาทรัพยากรบุคคล โรงพยาบาลเจ้าพระยายมราช สุพรรณบุรี <br> 035-514999 ต่อ 1906 หรือ 1907 ในวันเเละเวลาทำการ (จันทร์ - ศุกร์ เวลา 8.30 - 16.30 น.) </p>
