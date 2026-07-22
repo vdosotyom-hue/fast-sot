@@ -472,17 +472,131 @@
             </div>
         </div>
     </div>
-<!-- ⭐️ ปุ่มลอยด้านขวามือ ลิงก์ไปหน้าสร้าง QR Code -->
-    <a href="SOTQRCODE.html" class="floating-qr-widget" title="คลิกเพื่อไปหน้าสร้าง QR Code">
-        <div class="floating-qr-icon">
-            <svg viewBox="0 0 24 24">
-                <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3v-3zm0-3h3v2h-3v-2z"/>
-            </svg>
-        </div>
-        <div class="floating-qr-text">
-            <span class="title">สร้าง QR Code</span>
-            <span class="sub">บริการออนไลน์ฟรี</span>
-        </div>
+<!-- ⭐️ 1. ปุ่มลอยติดตามสถานะงานถ่ายภาพ/วิดีโอ (เพิ่มใหม่) -->
+<a href="track-jobs.html" class="floating-widget floating-status-widget" title="คลิกเพื่อติดตามสถานะงานถ่ายภาพ ">
+    <div class="floating-icon">
+        <svg viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+        </svg>
+    </div>
+    <div class="floating-text">
+        <span class="title">ติดตามสถานะงาน</span>
+        <span class="sub">ถ่ายภาพ </span>
+    </div>
+</a>
+
+<!-- ⭐️ 2. ปุ่มลอยสร้าง QR Code (ของเดิม) -->
+<a href="SOTQRCODE.html" class="floating-widget floating-qr-widget" title="คลิกเพื่อไปหน้าสร้าง QR Code">
+    <div class="floating-icon">
+        <svg viewBox="0 0 24 24">
+            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3v-3zm0-3h3v2h-3v-2z"/>
+        </svg>
+    </div>
+    <div class="floating-text">
+        <span class="title">สร้าง QR Code</span>
+        <span class="sub">บริการออนไลน์ฟรี</span>
+    </div>
+</a>
+
+<style>
+/* 📌 CSS สำหรับจัดการปุ่มลอยทั้งสองปุ่ม */
+.floating-widget {
+    position: fixed;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 87, 34, 0.85); /* สีส้มโปร่งแสงจางๆ */
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 16px 12px 14px;
+    border-radius: 30px 0 0 30px;
+    box-shadow: -2px 4px 15px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px); /* เอฟเฟกต์เบลอพื้นหลังกระจกจางๆ */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    opacity: 0.75; /* ความจางเริ่มต้น */
+}
+
+/* ปุ่มบน: ติดตามสถานะงาน */
+.floating-status-widget {
+    top: calc(50% - 32px);
+    transform: translateY(-50%);
+}
+
+/* ปุ่มล่าง: สร้าง QR Code */
+.floating-qr-widget {
+    top: calc(50% + 32px);
+    transform: translateY(-50%);
+}
+}
+
+/* เมื่อนำเมาส์ไปชี้ (Hover) ปุ่มจะเข้มขึ้นและเด้งออกมา */
+.floating-widget:hover {
+    opacity: 1;
+    background: rgba(255, 87, 34, 1);
+    padding-right: 22px;
+    box-shadow: -4px 6px 20px rgba(255, 87, 34, 0.35);
+}
+
+.floating-icon {
+    width: 38px;
+    height: 38px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.floating-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: #ff5722;
+}
+
+.floating-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.floating-text span.title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.floating-text span.sub {
+    font-size: 11px;
+    opacity: 0.9;
+}
+
+/* รองรับการแสดงผลบนสมาร์ทโฟน */
+@media screen and (max-width: 480px) {
+    .floating-status-widget {
+        top: auto;
+        bottom: 80px;
+        right: 15px;
+        transform: none;
+        border-radius: 25px;
+        padding: 8px 14px;
+    }
+    .floating-qr-widget {
+        top: auto;
+        bottom: 25px;
+        right: 15px;
+        transform: none;
+        border-radius: 25px;
+        padding: 8px 14px;
+    }
+    .floating-text span.sub {
+        display: none;
+    }
+}
+</style>
+
     </a>
     <!-- ส่วนท้ายเว็บ -->
     <footer>

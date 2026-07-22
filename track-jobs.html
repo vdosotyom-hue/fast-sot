@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ติดตามสถานะงานบริการ - Fast SOT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ⭐️ PapaParse ดึงข้อมูลจาก Google Sheets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+        body { background-color: #f5f7f8; color: #333; min-height: 100vh; }
+        
+        .top-bar { background-color: #4a4a4a; color: #ffffff; padding: 10px 20px; font-size: 13px; border-bottom: 3px solid #ff5722; }
+        .main-header { background-color: #ffffff; padding: 15px 40px; display: flex; align-items: center; }
+        .logo-area img { height: 60px; width: auto; margin-right: 20px; }
+        .header-text h1 { font-size: 20px; color: #2b2b2b; font-weight: 700; }
+        .header-text p { font-size: 13px; color: #666; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        
+        .page-title-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border-top: 4px solid #ff5722; text-align: center; }
+        .page-title-box h2 { font-size: 22px; color: #2b2b2b; }
+
+        /* กล่องค้นหา */
+        .search-box { margin-bottom: 20px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; }
+        .search-box input:focus { border-color: #ff5722; }
+        .search-box i { position: absolute; left: 15px; top: 15px; color: #aaa; }
+
+        /* ตารางแสดงผล */
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; min-width: 950px; }
+        th { background-color: #4a4a4a; color: white; padding: 14px 16px; font-weight: 600; white-space: nowrap; }
+        td { padding: 14px 16px; border-bottom: 1px solid #eee; }
+        tr:hover { background-color: #fcfcfc; }
+
+        /* ป้ายแท็กประเภทงานและช่วงเวลา */
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-type { background-color: #e3f2fd; color: #0d47a1; }
+        .badge-time { background-color: #fff3e0; color: #e65100; }
+
+        .loading, .no-data { text-align: center; padding: 40px; color: #777; }
+        
+        footer { background-color: #2b2b2b; color: #aaa; padding: 20px; text-align: center; font-size: 13px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">⚡ Fast SOT: ระบบติดตามสถานะขอรับบริการถ่ายภาพ / วิดีโอ</div>
+    
+    <header class="main-header">
+        <div class="logo-area"><img src="logoFastSOT.jpg" alt="Logo"></div>
+        <div class="header-text">
+            <h1>หน่วยงานเวชนิทัศน์และโสตทัศนศึกษา</h1>
+            <p>โรงพยาบาลเจ้าพระยายมราช สุพรรณบุรี</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-title-box">
+            <h2><i class="fa-solid fa-list-check" style="color: #ff5722;"></i> รายการขอรับบริการถ่ายภาพ / วิดีโอ</h2>
+        </div>
+
+        <!-- ช่องค้นหา -->
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหาหน่วยงาน, ตำแหน่ง, ชื่องาน, สถานที่จัดงาน...">
+        </div>
+
+        <!-- ตารางแสดงรายการงาน (8 คอลัมน์ใหม่) -->
+        <div class="table-container">
+            <table id="jobTable">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">วันเวลาบันทึก</th>
+                        <th style="width: 15%;">หน่วยงาน / ผู้ส่ง</th>
+                        <th style="width: 12%;">ตำแหน่ง</th>
+                        <th style="width: 12%;">ประเภทงาน</th>
+                        <th style="width: 20%;">ชื่องาน / กิจกรรม</th>
+                        <th style="width: 13%;">สถานที่จัดงาน</th>
+                        <th style="width: 10%;">วันที่จัดกิจกรรม</th>
+                        <th style="width: 8%;">ช่วงเวลา</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #ff5722;"></i><br><br>
+                            กำลังโหลดข้อมูลล่าสุด...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Fast SOT - งานเวชนิทัศน์และโสตทัศนศึกษา โรงพยาบาลเจ้าพระยายมราช สุพรรณบุรี</p>
+    </footer>
+
+    <script>
+        // ลิงก์ CSV จาก Google Sheet ของคุณ
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGvab7HKiw7vDgE6udaN7W3OO5b02i1zcqdkTFVFSDnbTXoJkjvcDI3hx-Ur1vNsdIPCJ2uzC9fp-2/pub?gid=6626012&single=true&output=csv';
+
+        function loadJobData() {
+            const tableBody = document.getElementById('tableBody');
+
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    const rows = results.data;
+                    tableBody.innerHTML = '';
+
+                    if (!rows || rows.length <= 1) {
+                        tableBody.innerHTML = '<tr><td colspan="8" class="no-data">ยังไม่มีข้อมูลการขอรับบริการ</td></tr>';
+                        return;
+                    }
+
+                    // วนลูปข้ามแถวแรก (Header)
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length < 2 || !row[0]) continue;
+
+                        // 📌 ดึงข้อมูลตรงตาม 8 ช่องที่คุณ Time กำหนด
+                        const timestamp  = row[0] ? row[0].trim() : '-'; // ช่อง 1: วันเวลาบันทึก
+                        const department = row[1] ? row[1].trim() : '-'; // ช่อง 2: หน่วยงาน/ผู้ส่ง
+                        const position   = row[2] ? row[2].trim() : '-'; // ช่อง 3: ตำแหน่ง
+                        const photoType  = row[3] ? row[3].trim() : '-'; // ช่อง 4: ประเภทการถ่ายภาพ
+                        const jobName    = row[4] ? row[4].trim() : '-'; // ช่อง 5: ชื่องาน/กิจกรรม
+                        const location   = row[5] ? row[5].trim() : '-'; // ช่อง 6: สถานที่จัดงาน
+                        const eventDate  = row[6] ? row[6].trim() : '-'; // ช่อง 7: วันที่จัดกิจกรรม
+                        const timeSlot   = row[7] ? row[7].trim() : '-'; // ช่อง 8: ช่วงเวลา
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><small style="color: #666;">${timestamp}</small></td>
+                            <td><strong>${department}</strong></td>
+                            <td>${position}</td>
+                            <td><span class="badge badge-type">${photoType}</span></td>
+                            <td style="color: #ff5722; font-weight: 600;">${jobName}</td>
+                            <td>${location}</td>
+                            <td>${eventDate}</td>
+                            <td><span class="badge badge-time">${timeSlot}</span></td>
+                        `;
+                        tableBody.appendChild(tr);
+                    }
+
+                    if (tableBody.innerHTML === '') {
+                        tableBody.innerHTML = '<tr><td colspan="8" class="no-data">ยังไม่มีรายการข้อมูล</td></tr>';
+                    }
+                },
+                error: function(err) {
+                    console.error("PapaParse Error:", err);
+                    tableBody.innerHTML = '<tr><td colspan="8" class="no-data" style="color:red;">❌ ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบการตั้งค่าไฟล์ Sheet</td></tr>';
+                }
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('jobTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                let text = tr[i].textContent || tr[i].innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+        // เรียกทำงานทันทีเมื่อโหลดหน้า
+        loadJobData();
+    </script>
+</body>
+</html>
